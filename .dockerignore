@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+.venv/
+.git/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.review_responder/
+*.egg-info/
+tests/
+deploy/
+CLAUDE.md

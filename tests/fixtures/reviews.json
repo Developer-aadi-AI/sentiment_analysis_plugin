@@ -1,0 +1,11 @@
+[
+  {"id": "pos-1", "text": "Absolutely love it! Fast delivery and great quality.", "rating": 5, "customer_name": "Priya Sharma", "customer_email": "priya@example.com"},
+  {"id": "neg-1", "text": "My order arrived damaged and nobody answers the phone. Terrible.", "rating": 1, "customer_name": "Rahul Verma", "customer_email": "rahul@example.com"},
+  {"id": "mixed-1", "text": "Love the design, but I was charged twice and support never replied.", "rating": 3, "customer_name": "Anita Desai", "customer_email": "anita@example.com"},
+  {"id": "sarcastic-1", "text": "Great, arrived broken again. Wonderful.", "rating": 4, "customer_name": "Sam Lee", "customer_email": "sam@example.com"},
+  {"id": "neutral-1", "text": "It's okay. Does what it says.", "rating": 3, "customer_name": "Vikram Singh", "customer_email": "vikram@example.com"},
+  {"id": "es-1", "text": "El producto llegó tarde y la caja estaba dañada.", "rating": 1, "customer_name": "Lucía García", "customer_email": "lucia@example.com"},
+  {"id": "empty-1", "text": "   ", "rating": 5, "customer_name": "Nobody", "customer_email": "nobody@example.com"},
+  {"id": "spam-1", "text": "BUY CHEAP WATCHES AT spam dot com!!!", "rating": 5, "customer_name": "Spammer", "customer_email": "spam@example.com"},
+  {"id": "noemail-1", "text": "Fantastic support, thank you!", "rating": 5, "customer_name": "Meera Iyer", "customer_email": null}
+]

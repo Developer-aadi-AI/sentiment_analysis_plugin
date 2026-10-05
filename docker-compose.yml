@@ -1,0 +1,19 @@
+services:
+  review-responder:
+    build: .
+    image: review-responder:latest
+    container_name: review-responder
+    restart: always            # comes back after crashes and VM reboots
+    env_file: .env
+    environment:
+      STATE_DB: /data/state.db
+    ports:
+      - "8000:8000"
+    volumes:
+      - responder-data:/data   # processed-review store survives restarts and redeploys
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+volumes:
+  responder-data:

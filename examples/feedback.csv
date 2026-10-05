@@ -1,0 +1,8 @@
+feedback_id,comment,stars,name,email,submitted_at,order_id
+1001,"Absolutely love the new headphones! Sound quality is amazing and delivery was super fast.",5,Priya Sharma,priya@example.com,2026-10-01T09:12:00,ORD-5531
+1002,"Great, my order arrived broken again. Third time this year. Really disappointed.",1,Rahul Verma,rahul@example.com,2026-10-01T11:40:00,ORD-5532
+1003,"The jacket fits well and looks great, but I was charged twice for it and support hasn't replied.",3,Anita Desai,anita@example.com,2026-10-02T08:05:00,ORD-5533
+1004,"It's okay. Does what it says.",3,Vikram Singh,vikram@example.com,2026-10-02T15:22:00,ORD-5534
+1005,"El producto llegó tarde y la caja estaba dañada. Muy mal servicio.",1,Lucía García,lucia@example.com,2026-10-03T10:00:00,ORD-5535
+1006,"",5,Empty Review,empty@example.com,2026-10-03T12:00:00,ORD-5536
+1007,"Fantastic support team, they fixed my login problem in minutes. Thank you!",5,Meera Iyer,,2026-10-04T09:30:00,ORD-5537
