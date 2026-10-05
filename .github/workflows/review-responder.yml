@@ -1,0 +1,97 @@
+name: Review Responder
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # every 15 min (GitHub may delay scheduled runs at busy times)
+  workflow_dispatch:
+    inputs:
+      approve_review_id:
+        description: "Send the stored draft for this review ID (needs DRY_RUN=false). Leave empty to just process new reviews."
+        required: false
+        default: ""
+
+permissions:
+  contents: write   # save the encrypted state to the responder-state branch
+  actions: write    # keep this scheduled workflow enabled
+
+concurrency:
+  group: review-responder   # never two runs at once: one email per review
+  cancel-in-progress: false
+
+env:
+  # ---- LLM: Groq free tier ----
+  LLM_PROVIDER: groq
+  LLM_MODEL: openai/gpt-oss-120b
+  # ---- Source: CSV demo (switch to sql later) ----
+  ADAPTER: csv
+  SOURCE_FILE: examples/feedback.csv
+  SOURCE_NAME: demo-shop
+  SOURCE_FIELD_MAP: '{"id":"feedback_id","text":"comment","rating":"stars","customer_name":"name","customer_email":"email","created_at":"submitted_at"}'
+  # ---- Email (only used once DRY_RUN is false) ----
+  SINK: smtp
+  SMTP_HOST: smtp.gmail.com
+  SMTP_PORT: "587"
+  SMTP_STARTTLS: "true"
+  # ---- Brand ----
+  BRAND_NAME: Demo Shop
+  BRAND_SIGNOFF: The Demo Shop Team
+  BRAND_VOICE: Warm, concise, human. No corporate jargon.
+  BRAND_NEVER_PROMISE: refunds, discounts, compensation, delivery dates
+  # ---- Safety ----
+  DRY_RUN: "true"
+  AUTO_SEND: "false"
+  MIN_CONFIDENCE: "0.7"
+  STATE_DB: .review_responder/state.db
+
+jobs:
+  respond:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install
+        run: pip install --quiet ".[groq]"
+
+      - name: Restore state
+        id: restore
+        env:
+          STATE_KEY: ${{ secrets.STATE_KEY }}
+        run: bash deploy/state.sh restore
+
+      - name: Process new reviews
+        if: ${{ !inputs.approve_review_id }}
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+        run: review-responder run --quiet   # no customer data in these public logs
+
+      - name: Approve and send one draft
+        if: ${{ inputs.approve_review_id }}
+        env:
+          REVIEW_ID: ${{ inputs.approve_review_id }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+        run: review-responder approve "$REVIEW_ID"
+
+      - name: Save state
+        if: ${{ always() && steps.restore.outcome == 'success' }}
+        env:
+          STATE_KEY: ${{ secrets.STATE_KEY }}
+        run: bash deploy/state.sh save
+
+      # Public repos' schedules are paused after 60 days without activity; re-enable each run.
+      - name: Keep schedule enabled
+        if: ${{ github.event_name == 'schedule' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/review-responder.yml/enable" || true

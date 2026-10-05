@@ -88,6 +88,8 @@ Logs redact email addresses and review text. The full data is kept only in the a
 review-responder run [--dry-run/--no-dry-run] [--limit N] [--provider offline] [--json]
 review-responder replay <review_id>     # re-run one review (an already-sent email is never re-sent)
 review-responder pending                # drafts awaiting approval or held
+review-responder drafts [--status S]    # everything in the state store
+review-responder run --quiet            # one line per review, no customer data (CI logs)
 review-responder approve <review_id>    # send after human review (needs DRY_RUN=false)
 
 uvicorn review_responder.api:app --reload
@@ -102,7 +104,8 @@ pytest -m evals                         # real-LLM evals (needs an API key)
 
 ## Deployment
 
-See [deploy/DEPLOY_ORACLE.md](deploy/DEPLOY_ORACLE.md) for an always-on, $0 setup on Oracle Cloud Always Free with Docker.
+- **GitHub Actions** (no card, no server): [deploy/DEPLOY_GITHUB_ACTIONS.md](deploy/DEPLOY_GITHUB_ACTIONS.md). A scheduled workflow processes new reviews every 15 minutes and keeps its state encrypted on a branch.
+- **Docker on a VM** (always-on, needs a VM; Oracle Always Free requires a card): [deploy/DEPLOY_ORACLE.md](deploy/DEPLOY_ORACLE.md).
 
 ## LLM providers
 

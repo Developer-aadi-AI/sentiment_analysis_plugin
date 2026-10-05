@@ -98,10 +98,12 @@ class ProcessedStore:
             ).fetchone()
         return json.loads(row[0]) if row else []
 
-    def list_by_status(self, status: str) -> list[ProcessResult]:
+    def list_by_status(self, status: str | None = None) -> list[ProcessResult]:
+        """Stored results with this status (all statuses when None), oldest first."""
+        sql = "SELECT result_json FROM processed"
+        params: tuple[str, ...] = ()
+        if status is not None:
+            sql, params = sql + " WHERE status = ?", (status,)
         with self._lock:
-            rows = self._conn.execute(
-                "SELECT result_json FROM processed WHERE status = ? ORDER BY updated_at",
-                (status,),
-            ).fetchall()
+            rows = self._conn.execute(sql + " ORDER BY updated_at", params).fetchall()
         return [ProcessResult.model_validate_json(r[0]) for r in rows if r[0] != "{}"]
